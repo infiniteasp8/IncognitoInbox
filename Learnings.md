@@ -1,0 +1,1 @@
+Next js is a edge time framework which run only at the time when requested, while with the other apllication applicn once starts it keep on running, once connection establishes keep connected but not in case of nextjs.
