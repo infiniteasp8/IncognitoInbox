@@ -1,0 +1,1 @@
+This is the folder to make use of "zod" library for the schema validation of the data in the input, without using the mongoose (time for accessing the mongoose is reduced for validation)
