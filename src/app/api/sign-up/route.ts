@@ -84,7 +84,7 @@ export async function POST (request: Request){
             }
         }
         return Response.json({
-            success: false,
+            success: true,
             message:"User registered successfully. Please verify your email"
         }, {status: 201})
     } catch (error) {

@@ -47,7 +47,7 @@ export default function VerificationEmail({username, otp} : VerificationEmailPro
                 </Row>
                 <Row>
                     <Text>
-                        Don't share <b> OTP</b> it with anyone. 
+                        Don't share this <b> OTP</b> with anyone. 
                     </Text>
                 </Row>
                 
