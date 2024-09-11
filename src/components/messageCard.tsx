@@ -26,7 +26,7 @@ import { X } from "lucide-react";
 import dayjs from 'dayjs';
 import { useToast } from "./ui/use-toast";
 import axios from "axios";
-import { ApiResponse } from "@/types/apiResponse";
+import { ApiResponse } from "@/types/ApiResponse";
 
 type MessageCardProps = {
   message: Message;
