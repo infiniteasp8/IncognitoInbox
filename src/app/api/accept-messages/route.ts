@@ -1,109 +1,123 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
+import userModel from "@/models/User.model";
 import dbConnect from "@/lib/dbConnect";
-import UserModel from "@/model/User";
 import { User } from "next-auth";
+// import { acceptMessageSchema } from "@/schemas/acceptMessageSchema";
 
-export async function POST(request: Request){
-    await dbConnect()
 
-    const session = await getServerSession(authOptions)
-    const user: User = session?.user as User
-    if(!session || !session.user){
-        return Response.json(
-            {
-            success: false,
-            message: "Not authenticated"
+// this is the post request for when we toggle the switch 
+export async function POST(request: Request) {
+  await dbConnect();
 
-            },
-            {status: 401}
-        )
+  const session = await getServerSession(authOptions);
+  const user: User = session?.user;
+
+  if (!session || !session.user) {
+    return Response.json(
+      {
+        success: false,
+        message: "not authenticated",
+      },
+      { status: 401 }
+    );
+  }
+
+  const userId = user._id;
+
+  // it is bringing data of that switch on dashboard stored i acceptMessages
+  const { acceptMessages } = await request.json();
+
+  try {
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { isAcceptingMessage: acceptMessages },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return Response.json(
+        {
+          success: false,
+          message: "failed to update user status to accept messages",
+        },
+        { status: 401 }
+      );
     }
-    const userId = user._id;
-    const {acceptMessages} = await request.json()
-    try {
-        const upatedUser = await UserModel.findByIdAndUpdate(
-            userId,
-            {isAcceptingMessages: acceptMessages},
-            {new: true}
-        )
-        if(!upatedUser){
-            return Response.json(
-                {
-                success: false,
-                message: "failed to update user status to accept messages"
-    
-                },
-                {status: 401}
-            )
-        }
-        return Response.json(
-            {
-            success: true,
-            message: "Message Acceptance status updated successfully"
 
-            },
-            {status: 200}
-        )
-    } catch (error) {
-        console.log("Failed to update user status to accept messages")
-        return Response.json(
-            {
-            success: false,
-            message: "failed to update user status to accept messages"
-
-            },
-            {status: 500}
-        )
-    }
+    // if toggle mode is updated
+    return Response.json(
+      {
+        success: true,
+        message: "message accept status updated successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    // this is for that toggle mode
+    console.log("failed to update user status to accept messages", error);
+    return Response.json(
+      {
+        success: false,
+        message: "failed to update user status to accept messages",
+      },
+      { status: 500 }
+    );
+  }
 }
 
-export async function GET(request:Request) {
-    await dbConnect()
 
-    const session = await getServerSession(authOptions)
-    const user: User = session?.user as User
-    if(!session || !session.user){
-        return Response.json(
-            {
-            success: false,
-            message: "Not authenticated"
+// this get request is sent to fetch all messages 
 
-            },
-            {status: 401}
-        )
+export async function GET(request: Request) {
+  await dbConnect();
+
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  if (!session || !session.user) {
+    return Response.json(
+      {
+        success: false,
+        message: "not authenticated",
+      },
+      { status: 401 }
+    );
+  }
+
+  const userId = user._id;
+  const foundUser = await userModel.findById(userId);
+  // console.log("founding user -> ", foundUser);
+
+  try {
+
+    if (!foundUser) {
+      return Response.json(
+        {
+          success: false,
+          message: "user not founded",
+        },
+        { status: 404 }
+      );
     }
-    const userId = user._id;
-    try {
-        const foundUser = await UserModel.findById(userId)
-        if(!foundUser){
-            return Response.json(
-                {
-                success: false,
-                message: "User not found"
-    
-                },
-                {status: 404}
-            )
-        }
-        return Response.json(
-            {
-            success: true,
-            message: "User not found",
-            isAcceptingMessages:  foundUser.isAcceptingMessages
-    
-            },
-            {status: 404}
-        )
-    } catch (error) {
-        console.log("Error in getting status acceptance message")
-        return Response.json(
-            {
-            success: false,
-            message: "Error in getting status acceptance message"
 
-            },
-            {status: 500}
-        )
-    }
+    return Response.json(
+      {
+        success: true,
+        isAcceptingMessage: foundUser.isAcceptingMessage,
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+
+    console.log("error in setting accepting message status", error);
+    return Response.json(
+      {
+        success: false,
+        message: "error in setting accepting message status",
+      },
+      { status: 500 }
+    );
+  }
 }

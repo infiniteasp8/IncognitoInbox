@@ -1,7 +1,9 @@
 import {z} from "zod"
 
+// this is to identify user in database 
+
 export const signInSchema = z.object({
-    // While logging in the user must enter username or email or identifier and password
-    identifier: z.string(),
-    password: z.string(),
+  // this identifier can be username , email 
+  identifier : z.string(),
+  password : z.string()
 })

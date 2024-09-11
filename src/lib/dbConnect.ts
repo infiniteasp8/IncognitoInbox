@@ -1,28 +1,28 @@
-import mongoose from "mongoose";
-
-// Manage the conditions that if the connection already exists dont make one more, else make one connection
+import mongoose from "mongoose"
 
 type ConnectionObject = {
-    // ? is for the making isConnected a optional field
-    isConnected?: number
+  isConnected?: Number
 }
 
 const connection: ConnectionObject = {}
 
-async function dbConnect(): Promise<void> {
-    if(connection.isConnected){
-        console.log("Already connected to Database");
-        return;
-    }
+async function dbConnect() : Promise <void> {
+  if(connection.isConnected){
+    console.log("db already connectd");
+    return;
+  }
+  const dbName = "mysteryMessage"
+  
+  try {
+    const db = await mongoose.connect(`${process.env.MONGODB_URI}/${dbName}` || "", {})
 
-    try {
-        const db = await mongoose.connect(process.env.MONGODB_URI ||'', {});
-        connection.isConnected = db.connections[0].readyState;
-        console.log("DB Connected Successfully");
-    } catch (error) {
-        console.log("DB connection failed", error);
-        // If not able to connect to database end the process
-        process.exit(1);
-    }
+    connection.isConnected = db.connections[0].readyState
+    console.log("db connected successfully");
+
+  } catch (error) {
+    console.log("database connection failed " , error);
+    process.exit(1) // since connection nahi hua toh exit app will not work
+  }
 }
-export default dbConnect;
+
+export default dbConnect
